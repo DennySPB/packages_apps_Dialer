@@ -46,16 +46,14 @@ public class SmartDialNameMatcher {
 
     private final ArrayList<SmartDialMatchPosition> mMatchPositions = Lists.newArrayList();
 
-    public static final SmartDialMap LATIN_SMART_DIAL_MAP = new LatinSmartDialMap();
-
     private final SmartDialMap mMap;
 
     private String mNameMatchMask = "";
     private String mPhoneNumberMatchMask = "";
 
     @VisibleForTesting
-    public SmartDialNameMatcher(String query) {
-        this(query, LATIN_SMART_DIAL_MAP);
+    public SmartDialNameMatcher(String query, Context context) {
+        this(query, SmartDialPrefix.getMap(), context);
     }
 
     public SmartDialNameMatcher(String query, SmartDialMap map) {
