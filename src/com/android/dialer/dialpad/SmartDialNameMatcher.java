@@ -412,7 +412,11 @@ public class SmartDialNameMatcher {
 
     public boolean matches(String displayName) {
         mMatchPositions.clear();
-        return matchesCombination(displayName, mQuery, mMatchPositions);
+        if (mMultiMatchObject != null && mMultiMatchMethod != null) {
+            return matchesMultiLanguage(displayName, mQuery, mMatchPositions);
+        } else {
+            return mMap.matchesCombination(this, displayName, mQuery, mMatchPositions);
+        }
     }
 
     public ArrayList<SmartDialMatchPosition> getMatchPositions() {
