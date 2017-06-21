@@ -29,7 +29,7 @@ import android.preference.SwitchPreference;
 
 import com.android.dialer.R;
 
-import cyanogenmod.providers.CMSettings;
+import android.provider.Settings;
 
 import java.util.Arrays;
 
@@ -88,22 +88,22 @@ public class LookupSettingsFragment extends PreferenceFragment
         final ContentResolver cr = getActivity().getContentResolver();
 
         if (preference == mEnableForwardLookup) {
-            CMSettings.System.putInt(cr, CMSettings.System.ENABLE_FORWARD_LOOKUP,
+            Settings.System.putInt(cr, Settings.System.ENABLE_FORWARD_LOOKUP,
                     ((Boolean) newValue) ? 1 : 0);
         } else if (preference == mEnablePeopleLookup) {
-            CMSettings.System.putInt(cr, CMSettings.System.ENABLE_PEOPLE_LOOKUP,
+            Settings.System.putInt(cr, Settings.System.ENABLE_PEOPLE_LOOKUP,
                     ((Boolean) newValue) ? 1 : 0);
         } else if (preference == mEnableReverseLookup) {
-            CMSettings.System.putInt(cr, CMSettings.System.ENABLE_REVERSE_LOOKUP,
+            Settings.System.putInt(cr, Settings.System.ENABLE_REVERSE_LOOKUP,
                     ((Boolean) newValue) ? 1 : 0);
         } else if (preference == mForwardLookupProvider) {
-            CMSettings.System.putString(cr, CMSettings.System.FORWARD_LOOKUP_PROVIDER,
+            Settings.System.putString(cr, Settings.System.FORWARD_LOOKUP_PROVIDER,
                     (String) newValue);
         } else if (preference == mPeopleLookupProvider) {
-            CMSettings.System.putString(cr, CMSettings.System.PEOPLE_LOOKUP_PROVIDER,
+            Settings.System.putString(cr, Settings.System.PEOPLE_LOOKUP_PROVIDER,
                     (String) newValue);
         } else if (preference == mReverseLookupProvider) {
-            CMSettings.System.putString(cr, CMSettings.System.REVERSE_LOOKUP_PROVIDER,
+            Settings.System.putString(cr, Settings.System.REVERSE_LOOKUP_PROVIDER,
                     (String) newValue);
         }
 
@@ -139,18 +139,18 @@ public class LookupSettingsFragment extends PreferenceFragment
 
     private void restoreLookupProviderSwitches() {
         final ContentResolver cr = getActivity().getContentResolver();
-        mEnableForwardLookup.setChecked(CMSettings.System.getInt(cr,
-                CMSettings.System.ENABLE_FORWARD_LOOKUP, 1) != 0);
-        mEnablePeopleLookup.setChecked(CMSettings.System.getInt(cr,
-                CMSettings.System.ENABLE_PEOPLE_LOOKUP, 1) != 0);
-        mEnableReverseLookup.setChecked(CMSettings.System.getInt(cr,
-                CMSettings.System.ENABLE_REVERSE_LOOKUP, 1) != 0);
+        mEnableForwardLookup.setChecked(Settings.System.getInt(cr,
+                Settings.System.ENABLE_FORWARD_LOOKUP, 1) != 0);
+        mEnablePeopleLookup.setChecked(Settings.System.getInt(cr,
+                Settings.System.ENABLE_PEOPLE_LOOKUP, 1) != 0);
+        mEnableReverseLookup.setChecked(Settings.System.getInt(cr,
+                Settings.System.ENABLE_REVERSE_LOOKUP, 1) != 0);
     }
 
     private void restoreLookupProviders() {
-        restoreLookupProvider(mForwardLookupProvider, CMSettings.System.FORWARD_LOOKUP_PROVIDER);
-        restoreLookupProvider(mPeopleLookupProvider, CMSettings.System.PEOPLE_LOOKUP_PROVIDER);
-        restoreLookupProvider(mReverseLookupProvider, CMSettings.System.REVERSE_LOOKUP_PROVIDER);
+        restoreLookupProvider(mForwardLookupProvider, Settings.System.FORWARD_LOOKUP_PROVIDER);
+        restoreLookupProvider(mPeopleLookupProvider, Settings.System.PEOPLE_LOOKUP_PROVIDER);
+        restoreLookupProvider(mReverseLookupProvider, Settings.System.REVERSE_LOOKUP_PROVIDER);
     }
 
     private void restoreLookupProvider(ListPreference pref, String key) {
@@ -160,10 +160,10 @@ public class LookupSettingsFragment extends PreferenceFragment
         }
 
         final ContentResolver cr = getActivity().getContentResolver();
-        String provider = CMSettings.System.getString(cr, key);
+        String provider = Settings.System.getString(cr, key);
         if (provider == null) {
             pref.setValueIndex(0);
-            CMSettings.System.putString(cr, key, pref.getValue());
+            Settings.System.putString(cr, key, pref.getValue());
         } else {
             pref.setValue(provider);
         }

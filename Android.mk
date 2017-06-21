@@ -68,9 +68,7 @@ LOCAL_STATIC_JAVA_LIBRARIES := \
     libphonenumber \
     ims-ext-common \
     phonebook_wrapper \
-    telephony-common \
-    org.cyanogenmod.platform.internal \
-    org.cyanogenmod.platform.sdk
+    telephony-common
 
 LOCAL_PACKAGE_NAME := Dialer
 LOCAL_CERTIFICATE := shared

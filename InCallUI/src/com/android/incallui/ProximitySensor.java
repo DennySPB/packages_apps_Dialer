@@ -32,13 +32,13 @@ import android.provider.Settings;
 import android.telecom.CallAudioState;
 import android.view.Display;
 
-import cyanogenmod.providers.CMSettings;
+import android.provider.Settings;
 
 import com.android.incallui.AudioModeProvider.AudioModeListener;
 import com.android.incallui.InCallPresenter.InCallState;
 import com.android.incallui.InCallPresenter.InCallStateListener;
 
-import org.cyanogenmod.platform.internal.R;
+import com.android.internal.R;
 
 /**
  * Class manages the proximity sensor for the in-call UI.
@@ -345,8 +345,8 @@ public class ProximitySensor implements AccelerometerListener.ChangeListener,
                     .toString());
 
             final boolean proximityOnWake = mProximityWakeSupported &&
-                    CMSettings.System.getInt(mContext.getContentResolver(),
-                            CMSettings.System.PROXIMITY_ON_WAKE, mProximityWakeDefault) == 1;
+                    Settings.System.getInt(mContext.getContentResolver(),
+                            Settings.System.PROXIMITY_ON_WAKE, mProximityWakeDefault) == 1;
 
             if ((mIsPhoneOffhook || (mHasIncomingCall && proximityOnWake))
                     && !screenOnImmediately) {
