@@ -30,4 +30,9 @@
     <string name="smart_category_title">Умные настройки</string>
     <string name="smart_mute_title">Умное отключение звука</string>
     <string name="smart_mute_summary">Отключать звук входящего вызова перевернув устройство</string>
+
+    <!-- Automatically call recording -->
+    <string name="call_recording_automatically_title">Автозапись</string>
+    <string name="call_recording_automatically_summary">Автоматичесая запись звонка</string>
+
 </resources>

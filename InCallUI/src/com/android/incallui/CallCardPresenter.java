@@ -336,7 +336,11 @@ public class CallCardPresenter extends Presenter<CallCardPresenter.CallCardUi> i
 
         CallRecorder recorder = CallRecorder.getInstance();
         boolean isVideo = VideoUtils.isVideoCall(mPrimary);
-        boolean isEnabled = getPrefs(mContext).getBoolean(mContext.getString(R.string.call_recording_automatically_key), false);
+//        boolean isEnabled = getPrefs(mContext).getBoolean(mContext.getString(R.string.call_recording_automatically_key), false);
+	
+            boolean isEnabled = Settings.System.getIntForUser(mContext.getContentResolver(),
+            Settings.System.CALL_RECORDING_AUTOMATICALLY_KEY, 0, UserHandle.USER_CURRENT) == 1;
+
         // Start/stop timers.
         if (isPrimaryCallActive()) {
             Log.d(this, "Starting the calltime timer");
