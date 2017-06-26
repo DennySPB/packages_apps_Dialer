@@ -29,7 +29,7 @@ import android.database.ContentObserver;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.UserHandle;
+//import android.os.UserHandle;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.provider.CallLog;
@@ -803,11 +803,11 @@ public class InCallPresenter implements CallList.Listener,
             return;
         }
 
-        boolean smartmute = Settings.System.getIntForUser(mContext.getContentResolver(),
-            Settings.System.BUTTON_SMART_MUTE_KEY, 0, UserHandle.USER_CURRENT) == 1;
+//        boolean smartmute = Settings.System.getIntForUser(mContext.getContentResolver(),
+//            Settings.System.BUTTON_SMART_MUTE_KEY, 0, UserHandle.USER_CURRENT) == 1;
 
-//        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
-        if (smartmute) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+	if (prefs.getBoolean("button_smart_mute", false)) {
             getTelecomManager().silenceRinger();
         }
     }
