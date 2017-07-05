@@ -31,6 +31,7 @@ import android.os.PowerManager;
 import android.provider.Settings;
 import android.telecom.CallAudioState;
 import android.view.Display;
+import android.telecom.TelecomManager;
 
 import android.provider.Settings;
 
@@ -54,6 +55,7 @@ public class ProximitySensor implements AccelerometerListener.ChangeListener,
     private static final String TAG = ProximitySensor.class.getSimpleName();
 
     private final PowerManager mPowerManager;
+    private final TelecomManager mTelecomManager;
     private final PowerManager.WakeLock mProximityWakeLock;
     private SensorManager mSensor;
     private Sensor mProxSensor;
@@ -65,14 +67,17 @@ public class ProximitySensor implements AccelerometerListener.ChangeListener,
     private boolean mHasIncomingCall = false;
     private boolean mIsPhoneOffhook = false;
     private boolean mIsPhoneOutgoing = false;
+    private boolean mIsPhoneRinging = false;
     private boolean mProximitySpeaker = false;
     private boolean mIsProxSensorFar = true;
+    private boolean mIsProxSensorNear = false;
     private int mProxSpeakerDelay = 100;
     private boolean mDialpadVisible;
     private Context mContext;
     private boolean mProximityWakeSupported;
     private int mProximityWakeDefault;
 
+    private static final int SENSOR_SENSITIVITY = 4;
     private final Handler mHandler = new Handler();
     private final Runnable mActivateSpeaker = new Runnable() {
         @Override
@@ -89,6 +94,7 @@ public class ProximitySensor implements AccelerometerListener.ChangeListener,
             AccelerometerListener accelerometerListener) {
         mContext = context;
         mPowerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+	mTelecomManager = (TelecomManager) context.getSystemService(Context.TELECOM_SERVICE);
         if (mPowerManager.isWakeLockLevelSupported(PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK)) {
             mProximityWakeLock = mPowerManager.newWakeLock(
                     PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK, TAG);
@@ -177,14 +183,12 @@ public class ProximitySensor implements AccelerometerListener.ChangeListener,
         }
 
         if (mHasIncomingCall) {
+	    updateProxRing();
+	    answerProx(mIsProxSensorNear);
             updateProximitySensorMode();
         }
 
-        if (mHasIncomingCall) {
-            updateProximitySensorMode();
-        }
-    }
-
+}
     @Override
     public void onSupportedAudioMode(int modeMask) {
     }
@@ -211,9 +215,14 @@ public class ProximitySensor implements AccelerometerListener.ChangeListener,
             mIsProxSensorFar = false;
         } else {
             mIsProxSensorFar = true;
+	    mIsProxSensorNear = false;
         }
-
+        if (event.values[0] <= SENSOR_SENSITIVITY ) {
+            mIsProxSensorNear = true;
+        }
+	Log.i(this, "Proximity sensor changed");
         setProxSpeaker(mIsProxSensorFar);
+	answerProx(mIsProxSensorNear);
     }
 
     @Override
@@ -373,6 +382,18 @@ public class ProximitySensor implements AccelerometerListener.ChangeListener,
         }
     }
 
+    private void updateProxRing() {
+        if (mSensor != null && mProxSensor != null) {
+            if (mHasIncomingCall) {
+                mSensor.registerListener(this, mProxSensor,
+                        SensorManager.SENSOR_DELAY_NORMAL);
+            } else {
+                mSensor.unregisterListener(this);
+            }
+        }
+    }
+
+
     private void setProxSpeaker(final boolean speaker) {
         // remove any pending audio changes scheduled
         mHandler.removeCallbacks(mActivateSpeaker);
@@ -409,6 +430,15 @@ public class ProximitySensor implements AccelerometerListener.ChangeListener,
         }
     }
 
+    private void answerProx(boolean isNear) {
+        final boolean proxIncallAnswPref =
+                (Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.PROXIMITY_AUTO_ANSWER_INCALL_ONLY, 0) == 1);
+
+	if (isNear && mTelecomManager != null && !isScreenReallyOff() && proxIncallAnswPref) {
+	mTelecomManager.acceptRingingCall();
+	}
+    }
     /**
      * Implementation of a {@link DisplayListener} that maintains a binary state:
      * Screen on vs screen off. Used by the proximity sensor manager to decide whether or not
