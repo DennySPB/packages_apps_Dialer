@@ -72,6 +72,7 @@ public class ProximitySensor implements AccelerometerListener.ChangeListener,
     private boolean mIsProxSensorFar = true;
     private boolean mIsProxSensorNear = false;
     private int mProxSpeakerDelay = 100;
+    private int mAnswerDelay = 5000;
     private boolean mDialpadVisible;
     private Context mContext;
     private boolean mProximityWakeSupported;
@@ -79,12 +80,22 @@ public class ProximitySensor implements AccelerometerListener.ChangeListener,
 
     private static final int SENSOR_SENSITIVITY = 4;
     private final Handler mHandler = new Handler();
+    private final Handler mHandlerAnswer = new Handler();
     private final Runnable mActivateSpeaker = new Runnable() {
         @Override
         public void run() {
             TelecomAdapter.getInstance().setAudioRoute(CallAudioState.ROUTE_SPEAKER);
         }
     };
+    private final Runnable mAnswerCall = new Runnable() {
+        @Override
+        public void run() {
+	    if (mHasIncomingCall) {
+	    mTelecomManager.acceptRingingCall();
+	    }
+        }
+    };
+
 
     // True if the keyboard is currently *not* hidden
     // Gets updated whenever there is a Configuration change
@@ -431,12 +442,21 @@ public class ProximitySensor implements AccelerometerListener.ChangeListener,
     }
 
     private void answerProx(boolean isNear) {
+        mHandlerAnswer.removeCallbacks(mAnswerCall);
+        final int audioMode = mAudioModeProvider.getAudioMode();
         final boolean proxIncallAnswPref =
                 (Settings.System.getInt(mContext.getContentResolver(),
                 Settings.System.PROXIMITY_AUTO_ANSWER_INCALL_ONLY, 0) == 1);
 
+        mAnswerDelay = Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.AUTO_ANSWER_DELAY, 5000);
+
 	if (isNear && mTelecomManager != null && !isScreenReallyOff() && proxIncallAnswPref) {
 	mTelecomManager.acceptRingingCall();
+	}
+	if (Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.AUTO_ANSWER_CALL_KEY, 0) == 1 && (audioMode == CallAudioState.ROUTE_WIRED_HEADSET || audioMode == CallAudioState.ROUTE_BLUETOOTH)) {
+        mHandlerAnswer.postDelayed(mAnswerCall, mAnswerDelay);
 	}
     }
     /**
