@@ -2070,7 +2070,7 @@ public class InCallPresenter implements CallList.Listener,
                 }
             }
         }
-        return new InCallUIMaterialColorMapUtils(
+        return new InCallUIMaterialColorMapUtils(mContext,
                 mContext.getResources()).calculatePrimaryAndSecondaryColor(highlightColor);
     }
 
